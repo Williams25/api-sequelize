@@ -1,6 +1,8 @@
 const express = require('express')
 const routes = express.Router()
 
-routes.use('/produto', (req, res) => res.status(200).send({mensagem: 'entro'}))
+const pessoas = require('./PessoasRouter')
+
+routes.use(pessoas)
 
 module.exports = routes
