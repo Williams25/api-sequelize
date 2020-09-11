@@ -1,12 +1,12 @@
-const express = require('express')
-const routes = express.Router()
+const { Router } = require('express')
+const routes = Router()
 
 const pessoas = require('../controllers/PessoasController')
 
-routes.get('/pessoas', pessoas.findAllPessoas)
-routes.get('/pessoas/:id', pessoas.findOnePessoas)
-routes.post('/pessoas', pessoas.createPessoas)
-routes.put('/pessoas', pessoas.updatePessoas)
-routes.delete('/pessoas/:id', pessoas.destroyPessoas)
+routes.get('/', pessoas.findAllPessoas)
+routes.get('/:id', pessoas.findOnePessoas)
+routes.post('/', pessoas.createPessoas)
+routes.put('/', pessoas.updatePessoas)
+routes.delete('/:id', pessoas.destroyPessoas)
 
 module.exports = routes

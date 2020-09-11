@@ -23,8 +23,9 @@ module.exports = {
   },
 
   async findOnePessoas(req, res) {
+    const { id } = req.params
+
     try {
-      const { id } = req.params
       const pessoas = await database.Pessoas.findOne({ where: { id: id } })
       if (pessoas) return res.status(200).json(pessoas)
       return res.status(404).json({ pessoas: 'Não encontrado' })
@@ -34,21 +35,21 @@ module.exports = {
   },
 
   async createPessoas(req, res) {
-    try {
-      const { nome, email, role, ativo } = req.body
+    const { nome, email, role, ativo } = req.body
 
-      if (!nome || !email || !role || !ativo) return res.status(400).json({
-        message: 'Campos inválidos',
-        require: {
-          body: {
-            nome: 'String',
-            email: 'String',
-            role: 'String',
-            ativo: 'Boolean'
-          }
+    if (!nome || !email || !role || !ativo) return res.status(400).json({
+      message: 'Campos inválidos',
+      require: {
+        body: {
+          nome: 'String',
+          email: 'String',
+          role: 'String',
+          ativo: 'Boolean'
         }
-      })
+      }
+    })
 
+    try {
       const pessoas = await database.Pessoas.create({ nome, email, role, ativo })
 
       return res.status(201).json(pessoas)
@@ -58,25 +59,23 @@ module.exports = {
   },
 
   async updatePessoas(req, res) {
-    try {
-      const { nome, email, role, ativo, id } = req.body
+    const { nome, email, role, ativo, id } = req.body
 
-      if (!nome || !email || !role || !ativo || !id) return res.status(400).json({
-        message: 'Campos inválidos',
-        require: {
-          body: {
-            nome: 'String',
-            email: 'String',
-            role: 'String',
-            ativo: 'Boolean'
-          }
+    if (!nome || !email || !role || !ativo || !id) return res.status(400).json({
+      message: 'Campos inválidos',
+      require: {
+        body: {
+          nome: 'String',
+          email: 'String',
+          role: 'String',
+          ativo: 'Boolean'
         }
-      })
+      }
+    })
 
+    try {
       const pessoas = await database.Pessoas.update({ nome, email, role, ativo },
-        {
-          where: { id: id }
-        })
+        { where: { id: id } })
 
       if (pessoas[0] === 0) return res.status(404).json({ pessoas: 'Não encontrado' })
 
@@ -89,8 +88,9 @@ module.exports = {
   },
 
   async destroyPessoas(req, res) {
+    const { id } = req.params
+
     try {
-      const { id } = req.params
       const pessoas = await database.Pessoas.destroy({ where: { id: id } })
 
       if (pessoas === 0) return res.status(404).json({ pessoas: 'Não encontrado' })

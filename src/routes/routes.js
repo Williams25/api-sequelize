@@ -1,8 +1,15 @@
-const express = require('express')
-const routes = express.Router()
+const { Router } = require('express')
+const routes = Router()
 
 const pessoas = require('./PessoasRouter')
+const niveis = require('./NiveisRouter')
+const turmas = require('./TurmasRouter')
+const matriculas = require('./MatriculasRouter')
+const pessoasMatriculas = require('./PessoasMatriculasRouter')
 
-routes.use(pessoas)
+routes.use('/pessoas', pessoas)
+routes.use('/niveis', niveis)
+routes.use('/turmas', turmas)
+routes.use('/matriculas', matriculas)
 
 module.exports = routes
