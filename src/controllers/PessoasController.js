@@ -2,7 +2,28 @@ const { Op } = require('sequelize')
 const database = require('../models')
 
 module.exports = {
-  async findAllPessoas(req, res) {
+  async findAll(req, res) {
+    try {
+      const pessoas = await database.Pessoas.scope('all').findAll()
+      const response = pessoas.map(pessoas => {
+        return {
+          id: pessoas.id,
+          nome: pessoas.nome,
+          email: pessoas.email,
+          role: pessoas.role,
+          ativo: pessoas.ativo,
+          createdAt: pessoas.createdAt,
+          updatedAt: pessoas.updatedAt,
+          deletedAt: pessoas.deletedAt
+        }
+      })
+      return res.status(200).json(response)
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  },
+
+  async findAllAtivo(req, res) {
     try {
       const pessoas = await database.Pessoas.findAll()
       const response = pessoas.map(pessoas => {
