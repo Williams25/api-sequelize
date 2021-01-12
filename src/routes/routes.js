@@ -5,7 +5,7 @@ const pessoas = require('./PessoasRouter')
 const niveis = require('./NiveisRouter')
 const turmas = require('./TurmasRouter')
 const matriculas = require('./MatriculasRouter')
-const pessoasMatriculas = require('./PessoasMatriculasRouter')
+
 
 routes.use('/pessoas', pessoas)
 routes.use('/niveis', niveis)

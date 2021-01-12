@@ -6,6 +6,7 @@ const matriculas = require('../controllers/MatriculasController')
 routes.get('/', matriculas.findAllMatriculas)
 routes.get('/:id', matriculas.findOneMatriculas)
 routes.post('/', matriculas.createMatriculas)
+routes.post('/:id', matriculas.restore)
 routes.put('/', matriculas.updateMatriculas)
 routes.delete('/:id', matriculas.destroyMatriculas)
 

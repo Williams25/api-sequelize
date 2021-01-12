@@ -13,7 +13,8 @@ module.exports = {
           role: pessoas.role,
           ativo: pessoas.ativo,
           createdAt: pessoas.createdAt,
-          updatedAt: pessoas.updatedAt
+          updatedAt: pessoas.updatedAt,
+          deletedAt: pessoas.deletedAt
         }
       })
       return res.status(200).json(response)
@@ -28,7 +29,7 @@ module.exports = {
     try {
       const pessoas = await database.Pessoas.findOne({ where: { id: id } })
       if (pessoas) return res.status(200).json(pessoas)
-      return res.status(404).json({ pessoas: 'Não encontrado' })
+      return res.status(404).json({ message: 'Não encontrado' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
@@ -95,7 +96,18 @@ module.exports = {
 
       if (pessoas === 0) return res.status(404).json({ pessoas: 'Não encontrado' })
 
-      return res.status(200).json({ pessoas: 'Apagado com sucesso' })
+      return res.status(200).json({ message: 'Apagado com sucesso' })
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  },
+
+  async restore(req, res) {
+    const { id } = req.params
+
+    try {
+      await database.Pessoas.restore({ where: { id: id } })
+      return res.status(200).json({ message: 'Cadastro restaurado com sucesso' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
