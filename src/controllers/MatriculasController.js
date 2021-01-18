@@ -1,4 +1,4 @@
-const { Op } = require('sequelize')
+const { Op, Sequelize } = require('sequelize')
 const database = require('../models')
 
 module.exports = {
@@ -17,6 +17,53 @@ module.exports = {
     try {
       const matriculas = await database.Matriculas.findOne({ where: { id } })
       return res.status(200).json(matriculas)
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  },
+
+  async findOneMatriculasEstudantes(req, res) {
+    const { id } = req.params
+
+    try {
+      const pessoa = await database.Pessoas.findOne({ where: { id } })
+      const matriculas = await pessoa.getAulasMatriculadas()
+      return res.status(200).json(matriculas)
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  },
+
+  async findOneMatriculasTurmas(req, res) {
+    const { id } = req.params
+
+    try {
+      const matriculas = await database.Matriculas.findAndCountAll({
+        where: {
+          turma_id: id,
+          status: 'confirmado'
+        },
+        limit: 20,
+        order: [['estudante_id', 'ASC']],
+      })
+      return res.status(200).json(matriculas)
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  },
+
+  async findMatriculasTurmasLimit(req, res) {
+    const lotacao = 4
+    try {
+      const tumasLotadas = await database.Matriculas.findAndCountAll({
+        where: {
+          status: 'confirmado',
+        },
+        attributes: ['turma_id'],
+        group: ['turma_id'],
+        having: Sequelize.literal(`count(turma_id) >= ${lotacao}`),
+      })
+      return res.status(200).json(tumasLotadas)
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
