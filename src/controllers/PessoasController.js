@@ -1,10 +1,10 @@
-const { Op } = require('sequelize')
-const database = require('../models')
+const { PessoasServices } = require('../services')
+// const PessoasServices = new pessoasServices()
 
 module.exports = {
   async findAll(req, res) {
     try {
-      const pessoas = await database.Pessoas.scope('all').findAll()
+      const pessoas = await PessoasServices.findAllPessoas()
       const response = pessoas.map(pessoas => {
         return {
           id: pessoas.id,
@@ -25,7 +25,7 @@ module.exports = {
 
   async findAllAtivo(req, res) {
     try {
-      const pessoas = await database.Pessoas.findAll()
+      const pessoas = await PessoasServices.findAllAtivos()
       const response = pessoas.map(pessoas => {
         return {
           id: pessoas.id,
@@ -48,7 +48,7 @@ module.exports = {
     const { id } = req.params
 
     try {
-      const pessoas = await database.Pessoas.findOne({ where: { id: id } })
+      const pessoas = await PessoasServices.findById(id)
       if (pessoas) return res.status(200).json(pessoas)
       return res.status(404).json({ message: 'Não encontrado' })
     } catch (error) {
@@ -72,7 +72,7 @@ module.exports = {
     })
 
     try {
-      const pessoas = await database.Pessoas.create({ nome, email, role, ativo })
+      const pessoas = await PessoasServices.create(req.body)
 
       return res.status(201).json(pessoas)
     } catch (error) {
@@ -96,12 +96,11 @@ module.exports = {
     })
 
     try {
-      const pessoas = await database.Pessoas.update({ nome, email, role, ativo },
-        { where: { id: id } })
+      const pessoas = await PessoasServices.update(req.body, id)
 
       if (pessoas[0] === 0) return res.status(404).json({ pessoas: 'Não encontrado' })
 
-      const pessoaAtualizada = await database.Pessoas.findOne({ where: { id: id } })
+      const pessoaAtualizada = await PessoasServices.findById(id)
 
       return res.status(200).json({ message: 'Alterado com sucesso', pessoa: pessoaAtualizada })
     } catch (error) {
@@ -113,7 +112,7 @@ module.exports = {
     const { id } = req.params
 
     try {
-      const pessoas = await database.Pessoas.destroy({ where: { id: id } })
+      const pessoas = await PessoasServices.delete(id)
 
       if (pessoas === 0) return res.status(404).json({ pessoas: 'Não encontrado' })
 
@@ -127,7 +126,7 @@ module.exports = {
     const { id } = req.params
 
     try {
-      await database.Pessoas.restore({ where: { id: id } })
+      await PessoasServices.restore(id)
       return res.status(200).json({ message: 'Cadastro restaurado com sucesso' })
     } catch (error) {
       return res.status(500).json({ message: error.message })

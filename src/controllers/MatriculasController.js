@@ -1,10 +1,12 @@
 const { Op, Sequelize } = require('sequelize')
 const database = require('../models')
 
+const { MatriculasServices, PessoasServices } = require('../services')
+
 module.exports = {
   async findAllMatriculas(req, res) {
     try {
-      const matriculas = await database.Matriculas.findAll()
+      const matriculas = await MatriculasServices.findAll()
       return res.status(200).json(matriculas)
     } catch (error) {
       return res.status(500).json({ message: error.message })
@@ -15,7 +17,7 @@ module.exports = {
     const { id } = req.params
 
     try {
-      const matriculas = await database.Matriculas.findOne({ where: { id } })
+      const matriculas = await MatriculasServices.findById(id)
       return res.status(200).json(matriculas)
     } catch (error) {
       return res.status(500).json({ message: error.message })
@@ -38,14 +40,11 @@ module.exports = {
     const { id } = req.params
 
     try {
-      const matriculas = await database.Matriculas.findAndCountAll({
-        where: {
-          turma_id: id,
-          status: 'confirmado'
-        },
-        limit: 20,
-        order: [['estudante_id', 'ASC']],
-      })
+      const matriculas = await MatriculasServices.findCountAll({ turma_id: id, status: 'confirmado' },
+        {
+          limit: 20,
+          order: [['estudante_id', 'ASC']],
+        })
       return res.status(200).json(matriculas)
     } catch (error) {
       return res.status(500).json({ message: error.message })
@@ -55,15 +54,23 @@ module.exports = {
   async findMatriculasTurmasLimit(req, res) {
     const lotacao = 4
     try {
-      const tumasLotadas = await database.Matriculas.findAndCountAll({
-        where: {
-          status: 'confirmado',
-        },
-        attributes: ['turma_id'],
-        group: ['turma_id'],
-        having: Sequelize.literal(`count(turma_id) >= ${lotacao}`),
-      })
+      const tumasLotadas = await MatriculasServices.findCountAll({ status: 'confirmado' },
+        {
+          attributes: ['turma_id'],
+          group: ['turma_id'],
+          having: Sequelize.literal(`count(turma_id) >= ${lotacao}`),
+        })
       return res.status(200).json(tumasLotadas)
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  },
+
+  async cancelarMatricula(req, res) {
+    const { estudante_id } = req.params
+    try {
+      await PessoasServices.cancelarMatricula(estudante_id)
+      return res.status(200).json({ message: 'Matricula cancelada' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
     }
@@ -83,7 +90,7 @@ module.exports = {
     })
 
     try {
-      const matriculas = await database.Matriculas.create({ status, estudante_id, turma_id })
+      const matriculas = await MatriculasServices.create(req.body)
       return res.status(201).json(matriculas)
     } catch (error) {
       return res.status(500).json({ message: error.message })
@@ -104,8 +111,7 @@ module.exports = {
       }
     })
     try {
-      const matriculas = await database.Matriculas.update({ status, estudante_id, turma_id },
-        { where: { id } })
+      const matriculas = await MatriculasServices.update(req.body, id)
 
       if (matriculas[0] === 0) return res.status(404).json({ matriculas: 'Não encontrado' })
 
@@ -120,7 +126,7 @@ module.exports = {
     const { id } = req.params
 
     try {
-      const matriculas = await database.Matriculas.destroy({ where: { id } })
+      const matriculas = await MatriculasServices.delete(id)
 
       if (matriculas === 0) return res.status(404).json({ matriculas: 'Não encontrado' })
       return res.status(200).json({ matriculas: 'Apagado com sucesso' })
@@ -133,7 +139,7 @@ module.exports = {
     const { id } = req.params
 
     try {
-      await database.Matriculas.restore({ where: { id: id } })
+      await MatriculasServices.restore(id)
       return res.status(200).json({ message: 'Cadastro restaurado com sucesso' })
     } catch (error) {
       return res.status(500).json({ message: error.message })
